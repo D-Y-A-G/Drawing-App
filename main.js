@@ -52,7 +52,7 @@ function stop(e) {
   }
   e.preventDefault();
 
-  if (e.type != "mouseout") {
+  if (e.type != "touchend") {
     restore_array.push(context.getImageData(0, 0, canvas.width, canvas.height));
     index += 1;
   }
