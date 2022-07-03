@@ -15,7 +15,7 @@ let restore_array = [];
 let index = -1;
 
 function change_color(e) {
-  draw_color = e.style.background;
+  draw_color = e.style["background-color"];
 }
 
 canvas.addEventListener("touchstart", start, false);
