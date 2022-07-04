@@ -1,14 +1,14 @@
 body {
   margin: 0;
-  padding: 30px;
+  padding: 20px;
   overflow: hidden;
   background-color: #fff;
+  position: absolute;
+  transform: translate(0%, 0%);
 }
 
 canvas {
-  width: 100%;
-  height: 100%;
-
+  width: 95%;
   box-shadow: -3px 2px 9px 6px black;
   cursor: pointer;
 }
@@ -26,6 +26,7 @@ canvas {
   justify-content: center;
   flex-direction: row;
   margin-top: 15px;
+  width: 95%;
 }
 .tools .color-field {
   height: 40px;
