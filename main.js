@@ -31,6 +31,7 @@ function aiDraw(e) {
 canvas.addEventListener(
   "touchstart",
   function (e) {
+    e.preventDefault();
     var touch = e.touches[0];
     var mouseEvent = new MouseEvent("mousedown", {
       clientX: touch.clientX,
@@ -80,7 +81,6 @@ function start(e) {
   is_drawing = true;
   context.beginPath();
   context.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
-  e.preventDefault();
 }
 
 function draw(e) {
@@ -92,7 +92,6 @@ function draw(e) {
     context.lineJoin = "round";
     context.stroke();
   }
-  e.preventDefault();
 }
 
 function stop(e) {
@@ -101,7 +100,6 @@ function stop(e) {
     context.closePath();
     is_drawing = false;
   }
-  e.preventDefault();
 
   if (e.type != "touchend") {
     restore_array.push(context.getImageData(0, 0, canvas.width, canvas.height));
