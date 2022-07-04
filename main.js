@@ -27,13 +27,54 @@ function aiDraw(e) {
   canvas.addEventListener("click").getElementById("draw");
 }
 
-// touch events not working
-canvas.addEventListener("touchstart", start, true);
-canvas.addEventListener("touchmove", draw, true);
-canvas.addEventListener("touchend", stop, false);
+// touch events
+canvas.addEventListener(
+  "touchstart",
+  function (e) {
+    var touch = e.touches[0];
+    var mouseEvent = new MouseEvent("mousedown", {
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+    });
+    canvas.dispatchEvent(mouseEvent);
+  },
+  false
+);
+canvas.addEventListener(
+  "touchmove",
+  function (e) {
+    var touch = e.touches[0];
+    var mouseEvent = new MouseEvent("mousemove", {
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+    });
+    canvas.dispatchEvent(mouseEvent);
+  },
+  false
+);
+canvas.addEventListener(
+  "touchend",
+  function (e) {
+    var mouseEvent = new MouseEvent("mouseup", {});
+    canvas.dispatchEvent(mouseEvent);
+  },
+  false
+);
+
+// mouse events
 canvas.addEventListener("mousedown", start, false);
 canvas.addEventListener("mousemove", draw, false);
 canvas.addEventListener("mouseup", stop, false);
+
+document.body.addEventListener("touchstart", handleTarget, false);
+document.body.addEventListener("touchmove", handleTarget, false);
+document.body.addEventListener("touchend", handleTarget, false);
+
+function handleTarget(e) {
+  if (e.target == canvas) {
+    e.preventDefault();
+  }
+}
 
 function start(e) {
   is_drawing = true;
