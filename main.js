@@ -8,7 +8,7 @@ context.fillStyle = "white";
 context.fillRect(0, 0, canvas.width, canvas.height);
 
 let draw_color = "black";
-let draw_width = "3";
+let draw_width = "10";
 let is_drawing = false;
 
 let restore_array = [];
@@ -18,11 +18,21 @@ function change_color(e) {
   draw_color = e.style["background-color"];
 }
 
-canvas.addEventListener("touchstart", start, false);
-canvas.addEventListener("touchmove", draw, false);
+// self draw ai function to generate a computer drawn image -- still brainstorming
+// ai needs to be able to draw random lines/circles
+// must know where to start and end or could be randomized
+// colors need to be randomized maybe using hsl?
+// maybe set up different steps on function for computer to draw
+function aiDraw(e) {
+  canvas.addEventListener("click").getElementById("draw");
+}
+
+// touch events not working
+canvas.addEventListener("touchstart", start, true);
+canvas.addEventListener("touchmove", draw, true);
+canvas.addEventListener("touchend", stop, false);
 canvas.addEventListener("mousedown", start, false);
 canvas.addEventListener("mousemove", draw, false);
-canvas.addEventListener("touchend", stop, false);
 canvas.addEventListener("mouseup", stop, false);
 
 function start(e) {
