@@ -31,6 +31,7 @@ function aiDraw(e) {
 canvas.addEventListener(
   "touchstart",
   function (e) {
+    e.preventDefault();
     var touch = e.touches[0];
     var mouseEvent = new MouseEvent("mousedown", {
       clientX: touch.clientX,
