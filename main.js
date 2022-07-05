@@ -105,8 +105,6 @@ function stop(e) {
     restore_array.push(context.getImageData(0, 0, canvas.width, canvas.height));
     index += 1;
   }
-
-  //   console.log(restore_array);
 }
 
 function clear_canvas() {
