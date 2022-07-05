@@ -123,3 +123,7 @@ function undo_last() {
     context.putImageData(restore_array[index], 0, 0);
   }
 }
+
+function redo_last() {
+  // TODO: Implement redo logic
+}
