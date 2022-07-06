@@ -27,54 +27,52 @@ function aiDraw(e) {
   canvas.addEventListener("click").getElementById("draw");
 }
 
-// touch events
-canvas.addEventListener(
-  "touchstart",
-  function (e) {
-    e.preventDefault();
-    var touch = e.touches[0];
-    var mouseEvent = new MouseEvent("mousedown", {
-      clientX: touch.clientX,
-      clientY: touch.clientY,
-    });
-    canvas.dispatchEvent(mouseEvent);
-  },
-  false
-);
-canvas.addEventListener(
-  "touchmove",
-  function (e) {
-    var touch = e.touches[0];
-    var mouseEvent = new MouseEvent("mousemove", {
-      clientX: touch.clientX,
-      clientY: touch.clientY,
-    });
-    canvas.dispatchEvent(mouseEvent);
-  },
-  false
-);
-canvas.addEventListener(
-  "touchend",
-  function (e) {
-    var mouseEvent = new MouseEvent("mouseup", {});
-    canvas.dispatchEvent(mouseEvent);
-  },
-  false
-);
+// touch events - document.body
+addListenerToElement(document.body, "touchstart", handleTarget, false);
+addListenerToElement(document.body, "touchmove", handleTarget, false);
+addListenerToElement(document.body, "touchend", handleTarget, false);
 
-// mouse events
-canvas.addEventListener("mousedown", start, false);
-canvas.addEventListener("mousemove", draw, false);
-canvas.addEventListener("mouseup", stop, false);
+// touch events - canvas
+addListenerToElement(canvas, "touchstart", mapToMouseEvent, false);
+addListenerToElement(canvas, "touchmove", mapToMouseEvent, false);
+addListenerToElement(canvas, "touchend", mapToMouseEvent, false);
 
-document.body.addEventListener("touchstart", handleTarget, false);
-document.body.addEventListener("touchmove", handleTarget, false);
-document.body.addEventListener("touchend", handleTarget, false);
+// mouse events - canvas
+addListenerToElement(canvas, "mousedown", start, false);
+addListenerToElement(canvas, "mousemove", draw, false);
+addListenerToElement(canvas, "mouseup", stop, false);
+
+function addListenerToElement(element, eventType, listener, options) {
+  element.addEventListener(eventType, listener, options);
+}
 
 function handleTarget(e) {
   if (e.target == canvas) {
     e.preventDefault();
   }
+}
+
+function mapToMouseEvent(e) {
+  const touch = e.touches[0];
+  var mouseEvent;
+
+  if (e.type === "touchstart") {
+    e.preventDefault();
+    mouseEvent = new MouseEvent("mousedown", {
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+    });
+  } else if (e.type === "touchmove") {
+    mouseEvent = new MouseEvent("mousemove", {
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+    });
+  } else if (e.type === "touchend") {
+    mouseEvent = new MouseEvent("mouseup", {});
+  } else {
+    console.error(`Failed to execute EventType: ${e.type}`);
+  }
+  canvas.dispatchEvent(mouseEvent);
 }
 
 function start(e) {
