@@ -58,6 +58,9 @@ body {
   margin: 0 10px;
   border-radius: 7%;
 }
+#buttonRedo {
+  background-color: teal;
+}
 
 .tools .button:hover {
   transform: scale(1.2);

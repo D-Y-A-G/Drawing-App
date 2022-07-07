@@ -123,3 +123,4 @@ function undo_last() {
     context.putImageData(restore_array[index], 0, 0);
   }
 }
+
