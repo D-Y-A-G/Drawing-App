@@ -37,29 +37,29 @@ function change_color(e) {
 //   canvas.addEventListener("click").getElementById("draw");
 // }
 
-// function to draw a circle
-function drawCircle(circle) {
-  if (circle > multiple) return;
-  for (let i = 0; i < circles; i++) {
-    color = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
-    ctx.beginPath();
-    ctx.arc(canvas.width / 2, canvas.height / 2, size * 0.8, 0, Math.PI * 2);
-    ctx.fillStyle = color;
-    ctx.fill();
+// function to draw a circle - uncomment to test
+// function drawCircle(circle) {
+//   if (circle > multiple) return;
+//   for (let i = 0; i < circles; i++) {
+//     color = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+//     ctx.beginPath();
+//     ctx.arc(canvas.width / 2, canvas.height / 2, size * 0.8, 0, Math.PI * 2);
+//     ctx.fillStyle = color;
+//     ctx.fill();
 
-    color2 = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
-    ctx.beginPath();
-    ctx.arc(canvas.width / 2, canvas.height, 120 * 1.5, 0, Math.PI * 2);
-    ctx.fillStyle = color2;
-    ctx.fill();
+//     color2 = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+//     ctx.beginPath();
+//     ctx.arc(canvas.width / 2, canvas.height, 120 * 1.5, 0, Math.PI * 2);
+//     ctx.fillStyle = color2;
+//     ctx.fill();
 
-    color3 = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
-    ctx.beginPath();
-    ctx.arc(canvas.width, canvas.height / 2, 150 * 2.5, 0, Math.PI * 2);
-    ctx.fillStyle = color3;
-    ctx.fill();
-  }
-}
+//     color3 = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+//     ctx.beginPath();
+//     ctx.arc(canvas.width, canvas.height / 2, 150 * 2.5, 0, Math.PI * 2);
+//     ctx.fillStyle = color3;
+//     ctx.fill();
+//   }
+// }
 
 aiDraw.addEventListener("click", function () {
   drawCircle();
