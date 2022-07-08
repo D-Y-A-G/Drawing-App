@@ -1,18 +1,28 @@
 const canvas = document.getElementById("canvas");
-canvas.width = window.innerWidth - 60;
-canvas.height = 400;
+let ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth - 10;
+canvas.height = window.innerHeight;
 
-let context = canvas.getContext("2d");
 let start_background_color = "white";
-context.fillStyle = "white";
-context.fillRect(0, 0, canvas.width, canvas.height);
+ctx.fillStyle = "white";
+ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+const multiple = 10;
+const circles = 5;
 let draw_color = "black";
-let draw_width = "10";
+let draw_width = "20";
 let is_drawing = false;
 
+let locationX = (Math.random() * 400) / 7;
+let locationY = (Math.random() * 200) / 5;
 let restore_array = [];
 let index = -1;
+let color = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+let color2 = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+let color3 = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+let size =
+  canvas.width < canvas.height ? canvas.width * 0.3 : canvas.height * 0.3;
+const aiDraw = document.getElementById("draw");
 
 function change_color(e) {
   draw_color = e.style["background-color"];
@@ -23,9 +33,37 @@ function change_color(e) {
 // must know where to start and end or could be randomized
 // colors need to be randomized maybe using hsl?
 // maybe set up different steps on function for computer to draw
-function aiDraw(e) {
-  canvas.addEventListener("click").getElementById("draw");
+// function aiDraw(e) {
+//   canvas.addEventListener("click").getElementById("draw");
+// }
+
+// function to draw a circle
+function drawCircle(circle) {
+  if (circle > multiple) return;
+  for (let i = 0; i < circles; i++) {
+    color = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+    ctx.beginPath();
+    ctx.arc(canvas.width / 2, canvas.height / 2, size * 0.8, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+
+    color2 = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+    ctx.beginPath();
+    ctx.arc(canvas.width / 2, canvas.height, 120 * 1.5, 0, Math.PI * 2);
+    ctx.fillStyle = color2;
+    ctx.fill();
+
+    color3 = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+    ctx.beginPath();
+    ctx.arc(canvas.width, canvas.height / 2, 150 * 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = color3;
+    ctx.fill();
+  }
 }
+
+aiDraw.addEventListener("click", function () {
+  drawCircle();
+});
 
 // touch events - document.body
 addListenerToElement(document.body, "touchstart", handleTarget, false);
@@ -77,38 +115,38 @@ function mapToMouseEvent(e) {
 
 function start(e) {
   is_drawing = true;
-  context.beginPath();
-  context.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+  ctx.beginPath();
+  ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
 }
 
 function draw(e) {
   if (is_drawing) {
-    context.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
-    context.strokeStyle = draw_color;
-    context.lineWidth = draw_width;
-    context.lineCap = "round";
-    context.lineJoin = "round";
-    context.stroke();
+    ctx.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+    ctx.strokeStyle = draw_color;
+    ctx.lineWidth = draw_width;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.stroke();
   }
 }
 
 function stop(e) {
   if (is_drawing) {
-    context.stroke();
-    context.closePath();
+    ctx.stroke();
+    ctx.closePath();
     is_drawing = false;
   }
 
   if (e.type != "touchend") {
-    restore_array.push(context.getImageData(0, 0, canvas.width, canvas.height));
+    restore_array.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
     index += 1;
   }
 }
 
 function clear_canvas() {
-  context.fillStyle = start_background_color;
-  context.clearRect(0, 0, canvas.width, canvas.height);
-  context.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = start_background_color;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   restore_array = [];
   index = -1;
@@ -120,7 +158,12 @@ function undo_last() {
   } else {
     index -= 1;
     restore_array.pop();
-    context.putImageData(restore_array[index], 0, 0);
+    ctx.putImageData(restore_array[index], 0, 0);
   }
 }
 
+window.addEventListener("resize", function () {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  size = canvas.width < canvas.height ? canvas.width * 0.3 : canvas.height;
+});
