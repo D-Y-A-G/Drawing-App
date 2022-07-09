@@ -37,9 +37,10 @@ function change_color(e) {
 //   canvas.addEventListener("click").getElementById("draw");
 // }
 
+// make a class function to draw circles
+
 // function to draw a circle
-function drawCircle(circle) {
-  if (circle > multiple) return;
+function drawCircle() {
   for (let i = 0; i < circles; i++) {
     color = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
     ctx.beginPath();
@@ -62,7 +63,7 @@ function drawCircle(circle) {
 }
 
 aiDraw.addEventListener("click", function () {
-  drawCircle();
+  drawCircle(4);
 });
 
 // touch events - document.body
