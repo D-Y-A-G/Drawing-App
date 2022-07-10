@@ -11,7 +11,8 @@ let draw_color = "black";
 let draw_width = "10";
 let is_drawing = false;
 
-let restore_array = [];
+let canvas_history = [];
+let restore_last_canvas_state = [];
 let index = -1;
 
 function change_color(e) {
@@ -100,7 +101,9 @@ function stop(e) {
   }
 
   if (e.type != "touchend") {
-    restore_array.push(context.getImageData(0, 0, canvas.width, canvas.height));
+    canvas_history.push(
+      context.getImageData(0, 0, canvas.width, canvas.height)
+    );
     index += 1;
   }
 }
@@ -110,17 +113,33 @@ function clear_canvas() {
   context.clearRect(0, 0, canvas.width, canvas.height);
   context.fillRect(0, 0, canvas.width, canvas.height);
 
-  restore_array = [];
+  canvas_history = [];
+  restore_last_canvas_state = [];
   index = -1;
 }
 
 function undo_last() {
-  if (index <= 0) {
-    clear_canvas();
-  } else {
+  if (canvas_history.length !== 0) {
     index -= 1;
-    restore_array.pop();
-    context.putImageData(restore_array[index], 0, 0);
+    let canvasImage = canvas_history.pop();
+    restore_last_canvas_state.push(canvasImage);
+    if (canvas_history.length > 0) {
+      context.putImageData(canvas_history[index], 0, 0);
+    } else {
+      context.fillStyle == start_background_color;
+      context.fillRect(0, 0, canvas.width, canvas.height);
+    }
   }
+  return; // do nothing
+}
+
+function redo_last() {
+  if (restore_last_canvas_state.length !== 0) {
+    index += 1;
+    let canvasImage = restore_last_canvas_state.pop();
+    canvas_history.push(canvasImage);
+    context.putImageData(canvas_history[index], 0, 0);
+  }
+  return; // do noothing
 }
 
