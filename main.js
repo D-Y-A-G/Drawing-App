@@ -119,22 +119,26 @@ function clear_canvas() {
 }
 
 function undo_last() {
-  if (canvas_history.length === 0) return; // do nothing
-  index -= 1;
-  let canvasImage = canvas_history.pop();
-  restore_last_canvas_state.push(canvasImage);
-  if (canvas_history.length > 0) {
-    context.putImageData(canvas_history[index], 0, 0);
-  } else {
-    context.fillStyle == start_background_color;
-    context.fillRect(0, 0, canvas.width, canvas.height);
+  if (canvas_history.length !== 0) {
+    index -= 1;
+    let canvasImage = canvas_history.pop();
+    restore_last_canvas_state.push(canvasImage);
+    if (canvas_history.length > 0) {
+      context.putImageData(canvas_history[index], 0, 0);
+    } else {
+      context.fillStyle == start_background_color;
+      context.fillRect(0, 0, canvas.width, canvas.height);
+    }
   }
+  return; // do nothing
 }
 
 function redo_last() {
-  if (restore_last_canvas_state.length === 0) return; // do noothing
-  index += 1;
-  let canvasImage = restore_last_canvas_state.pop();
-  canvas_history.push(canvasImage);
-  context.putImageData(canvas_history[index], 0, 0);
+  if (restore_last_canvas_state.length !== 0) {
+    index += 1;
+    let canvasImage = restore_last_canvas_state.pop();
+    canvas_history.push(canvasImage);
+    context.putImageData(canvas_history[index], 0, 0);
+  }
+  return; // do noothing
 }
