@@ -8,13 +8,26 @@ ctx.fillStyle = "white";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 const multiple = 10;
-const circles = 5;
+const circles = 10;
+// const circleArr = [];
+// const rectangleArr = [];
+const lineArr = [];
 let draw_color = "black";
 let draw_width = "20";
 let is_drawing = false;
+let hue = 0;
 
-let locationX = (Math.random() * 400) / 7;
-let locationY = (Math.random() * 200) / 5;
+const mouse = {
+  x: undefined,
+  y: undefined,
+};
+const touch = {
+  x: undefined,
+  y: undefined,
+};
+
+let locationX = Math.random() * 1000 + 300;
+let locationY = Math.random() * 100 + 450;
 let restore_array = [];
 let index = -1;
 let color = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
@@ -23,6 +36,9 @@ let color3 = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
 let size =
   canvas.width < canvas.height ? canvas.width * 0.3 : canvas.height * 0.3;
 const aiDraw = document.getElementById("draw");
+
+let sizeW = Math.random() * 200 + 610 / 2;
+let sizeL = Math.random() * 300 + 220;
 
 function change_color(e) {
   draw_color = e.style["background-color"];
@@ -38,34 +54,96 @@ function change_color(e) {
 // }
 
 // make a class function to draw circles
-
-// function to draw a circle
-function drawCircle() {
-  for (let i = 0; i < circles; i++) {
-    color = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+class Circles {
+  constructor() {
+    this.size = Math.random() * 100 + 200;
+    this.color = color;
+    this.locationX = locationX;
+    this.locationY = locationY;
+  }
+  draw() {
+    ctx.fillStyle = this.color;
     ctx.beginPath();
-    ctx.arc(canvas.width / 2, canvas.height / 2, size * 0.8, 0, Math.PI * 2);
-    ctx.fillStyle = color;
-    ctx.fill();
-
-    color2 = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
-    ctx.beginPath();
-    ctx.arc(canvas.width / 2, canvas.height, 120 * 1.5, 0, Math.PI * 2);
-    ctx.fillStyle = color2;
-    ctx.fill();
-
-    color3 = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
-    ctx.beginPath();
-    ctx.arc(canvas.width, canvas.height / 2, 150 * 2.5, 0, Math.PI * 2);
-    ctx.fillStyle = color3;
+    ctx.arc(this.locationX, this.locationY, this.size, 0, Math.PI * 2);
     ctx.fill();
   }
 }
 
-aiDraw.addEventListener("click", function () {
-  drawCircle(4);
-});
+class Rectangles {
+  constructor() {
+    this.positionX = Math.random() * 100 + 50;
+    this.positionY = Math.random() * 100 + 150;
+    this.sizeW = sizeW;
+    this.sizeL = sizeL;
+    this.color = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+  }
+  draw() {
+    ctx.fillStyle = this.color;
+    ctx.fillRect(this.positionX, this.positionY, sizeW, sizeL);
+    ctx.fill();
+  }
+}
 
+class Connector {
+  constructor() {
+    this.locationX = locationX;
+    this.locationY = locationY;
+    // this.x = mouse.x;
+    // this.y = mouse.y;
+    this.size = Math.random() * 10 + 1;
+    this.color = color3;
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = size / 10;
+    ctx.moveTo(locationX, locationY);
+    ctx.lineTo(300, 300);
+    ctx.stroke();
+  }
+}
+// connectLine function
+
+// function line() {}
+
+// function to draw a circle
+// function drawCircle() {
+//   for (let i = 0; i < circles; i++) {
+//     color = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+//     ctx.beginPath();
+//     ctx.arc(canvas.width / 2, canvas.height / 2, size * 0.8, 0, Math.PI * 2);
+//     ctx.fillStyle = color;
+//     ctx.fill();
+
+//     color2 = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+//     ctx.beginPath();
+//     ctx.arc(canvas.width / 2, canvas.height, 120 * 1.5, 0, Math.PI * 2);
+//     ctx.fillStyle = color2;
+//     ctx.fill();
+
+//     color3 = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+//     ctx.beginPath();
+//     ctx.arc(canvas.width, canvas.height / 2, 150 * 2.5, 0, Math.PI * 2);
+//     ctx.fillStyle = color3;
+//     ctx.fill();
+//   }
+// }
+function drawShapes() {
+  aiDraw.addEventListener("click", function () {
+    // drawCircle(4);
+    // for (let i = 0; i < 1; i++) {
+    const circles = new Circles();
+    circles.draw();
+    const rectangles = new Rectangles();
+    rectangles.draw();
+    const connector = new Connector();
+    connector.draw();
+
+    // }
+    // connectLine();
+  });
+}
+drawShapes();
 // touch events - document.body
 addListenerToElement(document.body, "touchstart", handleTarget, false);
 addListenerToElement(document.body, "touchmove", handleTarget, false);
