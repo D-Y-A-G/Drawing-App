@@ -8,7 +8,7 @@ let locationY = Math.random() * 1000 + 450;
 let restore_array = [];
 let index = -1;
 let color = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
-let color2 = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+let color2 = "hsl(" + Math.random() * 360 + ", 100%, 50%)"; // adding different variables to randomize different colors for shapes
 let color3 = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
 let size =
   canvas.width < canvas.height ? canvas.width * 0.3 : canvas.height * 0.3;
@@ -20,12 +20,8 @@ let draw_color = color;
 let draw_width = "20";
 let is_drawing = false;
 let hue = 0;
-let lines = 2;
-let maxLines = 5;
 let lineSpread = 0.5;
 let lineWidth = Math.random() * 20 + 10;
-let sides = 30;
-let scale = 0.5;
 
 const multiple = 10;
 const circles = 10;
@@ -59,10 +55,25 @@ function change_color(e) {
 // make a class function to draw circles, rectangles or different shapes
 class Circles {
   constructor() {
-    this.size = Math.random() * 100 + 200;
+    this.size = Math.random() * 500 + Math.random() * 800;
     this.color = color;
     this.locationX = locationX;
     this.locationY = locationY;
+  }
+  draw() {
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(this.locationX, this.locationY, this.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+class Circles2 {
+  constructor() {
+    this.size = Math.random() * 1000 + Math.random() * 800;
+    this.color = color;
+    this.locationX = (Math.random() * 390) / locationX;
+    this.locationY = (Math.random() * 1000) / locationY;
   }
   draw() {
     ctx.fillStyle = this.color;
@@ -76,8 +87,8 @@ class Rectangles {
   constructor() {
     this.positionX = Math.random() * 100 + 50;
     this.positionY = Math.random() * 100 + 150;
-    this.sizeW = sizeW;
-    this.sizeL = sizeL;
+    this.sizeW = Math.random() * 1000 + Math.random() * 800;
+    this.sizeL = Math.random() * 1000 + Math.random() * 800;
     this.color = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
   }
   draw() {
@@ -90,8 +101,8 @@ class Rectangles {
 //testing connector to shapes
 class Connector {
   constructor() {
-    this.locationX = locationX;
-    this.locationY = locationY;
+    this.locationX = Math.random() * 1000 + 1300;
+    this.locationY = Math.random() * 1000 + Math.random() * 800;
     // this.x = mouse.x;
     // this.y = mouse.y;
     this.size = Math.random() * 10 + 1;
@@ -99,47 +110,12 @@ class Connector {
   }
   draw() {
     ctx.beginPath();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = size / 10;
+    ctx.strokeStyle = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+    ctx.lineWidth = size * 3;
     ctx.moveTo(locationX, locationY);
     ctx.lineTo(300, 300);
     ctx.stroke();
   }
-}
-
-function line() {
-  // if (level > maxLines) return;
-  ctx.beginPath();
-  ctx.moveTo(0, 0);
-  ctx.lineTo(size, 0);
-  ctx.stroke();
-  for (let i = 0; i < lines; i++) {
-    ctx.save(); // first save state
-    ctx.translate(size - (size / lines) * i, 0);
-    ctx.scale(1.2, 1.3); // can be set to a variable
-    ctx.save();
-    ctx.rotate(lineSpread);
-    ctx.restore();
-
-    ctx.restore(); //second restore from first save state
-  }
-  ctx.beginPath();
-  ctx.arc(0, size, size * 0.1, 0, Math.PI * 2);
-  ctx.fill();
-}
-
-function fractal() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.save();
-  ctx.lineWidth = lineWidth;
-  ctx.strokeStyle = color;
-  ctx.fillStyle = color;
-  ctx.translate(canvas.width / 2, canvas.height / 2);
-  for (let i = 0; i < sides; i++) {
-    ctx.rotate((Math.PI * 2) / sides);
-  }
-  line();
-  ctx.restore();
 }
 
 // function to draw a circle
@@ -171,13 +147,14 @@ function drawShapes() {
     const circles = new Circles();
     circles.draw();
 
+    const circles2 = new Circles2();
+    circles2.draw(2);
+
     const rectangles = new Rectangles();
     rectangles.draw();
 
     const connector = new Connector();
     connector.draw();
-
-    // fractal();
 
     // }
   });
