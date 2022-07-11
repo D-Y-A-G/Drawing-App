@@ -236,9 +236,7 @@ function stop(e) {
   }
 
   if (e.type != "touchend") {
-    canvas_history.push(
-      context.getImageData(0, 0, canvas.width, canvas.height)
-    );
+    canvas_history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
     index += 1;
   }
 }
@@ -259,10 +257,10 @@ function undo_last() {
     let canvasImage = canvas_history.pop();
     restore_last_canvas_state.push(canvasImage);
     if (canvas_history.length > 0) {
-      context.putImageData(canvas_history[index], 0, 0);
+      ctx.putImageData(canvas_history[index], 0, 0);
     } else {
-      context.fillStyle == start_background_color;
-      context.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle == start_background_color;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
   }
   return; // do nothing
@@ -273,7 +271,7 @@ function redo_last() {
     index += 1;
     let canvasImage = restore_last_canvas_state.pop();
     canvas_history.push(canvasImage);
-    context.putImageData(canvas_history[index], 0, 0);
+    ctx.putImageData(canvas_history[index], 0, 0);
   }
   return; // do noothing
 }
