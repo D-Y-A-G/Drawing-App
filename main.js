@@ -3,31 +3,8 @@ let ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth - 10;
 canvas.height = window.innerHeight;
 
-let start_background_color = "white";
-ctx.fillStyle = "white";
-ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-const multiple = 10;
-const circles = 10;
-// const circleArr = [];
-// const rectangleArr = [];
-const lineArr = [];
-let draw_color = "black";
-let draw_width = "20";
-let is_drawing = false;
-let hue = 0;
-
-const mouse = {
-  x: undefined,
-  y: undefined,
-};
-const touch = {
-  x: undefined,
-  y: undefined,
-};
-
 let locationX = Math.random() * 1000 + 300;
-let locationY = Math.random() * 100 + 450;
+let locationY = Math.random() * 1000 + 450;
 let restore_array = [];
 let index = -1;
 let color = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
@@ -39,6 +16,32 @@ const aiDraw = document.getElementById("draw");
 
 let sizeW = Math.random() * 200 + 610 / 2;
 let sizeL = Math.random() * 300 + 220;
+let draw_color = color;
+let draw_width = "20";
+let is_drawing = false;
+let hue = 0;
+let lines = 2;
+let maxLines = 5;
+let lineSpread = 0.5;
+let lineWidth = Math.random() * 20 + 10;
+let sides = 30;
+let scale = 0.5;
+
+const multiple = 10;
+const circles = 10;
+const lineArr = [];
+
+const mouse = {
+  x: undefined,
+  y: undefined,
+};
+const touch = {
+  x: undefined,
+  y: undefined,
+};
+let start_background_color = "white";
+ctx.fillStyle = "white";
+ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 function change_color(e) {
   draw_color = e.style["background-color"];
@@ -53,7 +56,7 @@ function change_color(e) {
 //   canvas.addEventListener("click").getElementById("draw");
 // }
 
-// make a class function to draw circles
+// make a class function to draw circles, rectangles or different shapes
 class Circles {
   constructor() {
     this.size = Math.random() * 100 + 200;
@@ -84,6 +87,7 @@ class Rectangles {
   }
 }
 
+//testing connector to shapes
 class Connector {
   constructor() {
     this.locationX = locationX;
@@ -102,9 +106,41 @@ class Connector {
     ctx.stroke();
   }
 }
-// connectLine function
 
-// function line() {}
+function line() {
+  // if (level > maxLines) return;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(size, 0);
+  ctx.stroke();
+  for (let i = 0; i < lines; i++) {
+    ctx.save(); // first save state
+    ctx.translate(size - (size / lines) * i, 0);
+    ctx.scale(1.2, 1.3); // can be set to a variable
+    ctx.save();
+    ctx.rotate(lineSpread);
+    ctx.restore();
+
+    ctx.restore(); //second restore from first save state
+  }
+  ctx.beginPath();
+  ctx.arc(0, size, size * 0.1, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function fractal() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.save();
+  ctx.lineWidth = lineWidth;
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.translate(canvas.width / 2, canvas.height / 2);
+  for (let i = 0; i < sides; i++) {
+    ctx.rotate((Math.PI * 2) / sides);
+  }
+  line();
+  ctx.restore();
+}
 
 // function to draw a circle
 // function drawCircle() {
@@ -134,16 +170,20 @@ function drawShapes() {
     // for (let i = 0; i < 1; i++) {
     const circles = new Circles();
     circles.draw();
+
     const rectangles = new Rectangles();
     rectangles.draw();
+
     const connector = new Connector();
     connector.draw();
 
+    // fractal();
+
     // }
-    // connectLine();
   });
 }
 drawShapes();
+
 // touch events - document.body
 addListenerToElement(document.body, "touchstart", handleTarget, false);
 addListenerToElement(document.body, "touchmove", handleTarget, false);
