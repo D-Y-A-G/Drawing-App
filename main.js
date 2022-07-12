@@ -14,17 +14,29 @@ let size =
   canvas.width < canvas.height ? canvas.width * 0.3 : canvas.height * 0.3;
 const aiDraw = document.getElementById("draw");
 
+//canvas settings
+ctx.fillStyle = color;
+ctx.lineCap = "round";
+ctx.shadowColor = "rgba(0,0,0, 0.75)";
+ctx.shadowOffsetX = 5;
+ctx.shadowOffsetY = 5;
+ctx.shadowBlur = 10;
+
+const maxLevel = 5;
+const branches = Math.random() * 2 + 0.7;
+
+let spread = Math.random() * 1.5 + 1;
+let scale = 0.6;
+let sides = Math.random() * 12;
 let sizeW = Math.random() * 200 + 610 / 2;
 let sizeL = Math.random() * 300 + 220;
-let draw_color = color;
+let draw_color = color3;
 let draw_width = "20";
 let is_drawing = false;
 let hue = 0;
 let lineSpread = 0.5;
-let lineWidth = Math.random() * 20 + 10;
+let lineWidth = Math.random() * 20 + Math.random() * 10;
 
-const multiple = 10;
-const circles = 10;
 const lineArr = [];
 
 const mouse = {
@@ -54,6 +66,43 @@ function change_color(e) {
 //   canvas.addEventListener("click").getElementById("draw");
 // }
 
+// randomize shape object with fractal
+
+function drawLines(level) {
+  if (level > maxLevel) return;
+  ctx.beginPath(0, 0);
+  ctx.moveTo(0, 0);
+  ctx.lineTo(500, 0);
+  ctx.stroke();
+  for (let i = 0; i < branches; i++) {
+    ctx.save();
+    ctx.translate(size - (size / branches) * i, 0);
+    ctx.scale(scale, scale);
+    ctx.save();
+    ctx.rotate(spread);
+    drawLines(level + 1);
+    ctx.restore();
+    ctx.restore();
+  }
+  ctx.beginPath();
+  ctx.arc(0, size, size * 0.2, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawFrac() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.save();
+  ctx.lineWidth = lineWidth;
+  ctx.strokeStyle = color;
+  ctx.fillStyle = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+  ctx.translate(canvas.width / 2, canvas.height / 2);
+  for (let i = 0; i < sides; i++) {
+    ctx.rotate(-0.78);
+    drawLines(0);
+  }
+  ctx.restore();
+}
+
 // make a class function to draw circles, rectangles or different shapes
 class Circles {
   constructor() {
@@ -63,7 +112,7 @@ class Circles {
     this.locationY = locationY;
   }
   draw() {
-    ctx.fillStyle = this.color;
+    ctx.fillStyle = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
     ctx.beginPath();
     ctx.arc(this.locationX, this.locationY, this.size, 0, Math.PI * 2);
     ctx.fill();
@@ -78,47 +127,29 @@ class Circles2 {
     this.locationY = (Math.random() * 1000) / locationY;
   }
   draw() {
-    ctx.fillStyle = this.color;
+    ctx.fillStyle = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
     ctx.beginPath();
     ctx.arc(this.locationX, this.locationY, this.size, 0, Math.PI * 2);
     ctx.fill();
   }
 }
 
-class Rectangles {
+class Connector {
   constructor() {
-    this.positionX = Math.random() * 100 + 50;
-    this.positionY = Math.random() * 100 + 150;
-    this.sizeW = Math.random() * 1000 + Math.random() * 800;
-    this.sizeL = Math.random() * 1000 + Math.random() * 800;
-    this.color = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+    this.size = Math.random() * 1000 + Math.random() * 800;
+    this.color = color;
+    this.locationX = (Math.random() * 390) / locationX;
+    this.locationY = (Math.random() * 1000) / locationY;
   }
   draw() {
-    ctx.fillStyle = this.color;
-    ctx.fillRect(this.positionX, this.positionY, sizeW, sizeL);
+    ctx.fillStyle = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+    ctx.beginPath();
+    ctx.arc(this.locationX * 2, this.locationY * 2, this.size, 0, Math.PI * 2);
     ctx.fill();
   }
 }
 
 //testing connector to shapes
-class Connector {
-  constructor() {
-    this.locationX = Math.random() * 1000 + 1300;
-    this.locationY = Math.random() * 1000 + Math.random() * 800;
-    // this.x = mouse.x;
-    // this.y = mouse.y;
-    this.size = Math.random() * 10 + 1;
-    this.color = color3;
-  }
-  draw() {
-    ctx.beginPath();
-    ctx.strokeStyle = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
-    ctx.lineWidth = size * 3;
-    ctx.moveTo(locationX, locationY);
-    ctx.lineTo(300, 300);
-    ctx.stroke();
-  }
-}
 
 // function to draw a circle
 // function drawCircle() {
@@ -145,18 +176,18 @@ class Connector {
 function drawShapes() {
   aiDraw.addEventListener("click", function () {
     // drawCircle(4);
-    // for (let i = 0; i < 1; i++) {
-    const circles = new Circles();
-    circles.draw();
+    // for (let i = 0; i < 1; i++)
 
-    const circles2 = new Circles2();
-    circles2.draw(2);
+    drawFrac();
 
-    const rectangles = new Rectangles();
-    rectangles.draw();
+    // const circles = new Circles();
+    // circles.draw();
 
-    const connector = new Connector();
-    connector.draw();
+    // const circles2 = new Circles2();
+    // circles2.draw();
+
+    // const connector = new Connector();
+    // connector.draw();
 
     // }
   });
