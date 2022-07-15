@@ -195,6 +195,13 @@ function drawLines(level) {
   ctx.arc(0, size, size * 0.2, 0, Math.PI * 2);
   ctx.fill();
 }
+
+function saveImage() {
+  var image = canvas
+    .toDataURL("image/png")
+    .replace("image/png", "image/octet-stream");
+  window.location.href = image;
+}
 //#endregion
 
 //#region --------- Helpers ---------

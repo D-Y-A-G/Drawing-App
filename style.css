@@ -18,6 +18,9 @@ body {
 #clear {
   background-color: red;
 }
+#save {
+  background-color: green;
+}
 
 .tools {
   display: flex;
