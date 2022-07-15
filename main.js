@@ -1,33 +1,31 @@
+//#region --------- Globals ---------
+const DEFAULT_BACKGROUND_COLOR = "white";
+const aiDraw = document.getElementById("draw");
 const canvas = document.getElementById("canvas");
-canvas.width = window.innerWidth - 60;
-canvas.height = 400;
+canvas.width = window.innerWidth - 10;
+canvas.height = window.innerHeight;
 
-let context = canvas.getContext("2d");
-let start_background_color = "white";
-context.fillStyle = "white";
-context.fillRect(0, 0, canvas.width, canvas.height);
+const maxLevel = 5;
+let ctx = canvas.getContext("2d");
+ctx.fillStyle = DEFAULT_BACKGROUND_COLOR;
+ctx.lineCap = "round";
+ctx.shadowColor = "rgba(0,0,0, 0.75)";
+ctx.shadowOffsetX = 5;
+ctx.shadowOffsetY = 5;
+ctx.shadowBlur = 10;
+ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-let draw_color = "black";
-let draw_width = "10";
-let is_drawing = false;
-
-let canvas_history = [];
-let restore_last_canvas_state = [];
+let color = generateHslColor();
+let drawColor = generateHslColor();
+let drawWidth = "20";
 let index = -1;
+let isDrawing = false;
+let scale = 0.6;
+let canvasHistory = [];
+let restoreLastCanvasState = [];
+//#endregion
 
-function change_color(e) {
-  draw_color = e.style["background-color"];
-}
-
-// self draw ai function to generate a computer drawn image -- still brainstorming
-// ai needs to be able to draw random lines/circles
-// must know where to start and end or could be randomized
-// colors need to be randomized maybe using hsl?
-// maybe set up different steps on function for computer to draw
-function aiDraw(e) {
-  canvas.addEventListener("click").getElementById("draw");
-}
-
+//#region --------- Drawing Event Listeners ---------
 // touch events - document.body
 addListenerToElement(document.body, "touchstart", handleTarget, false);
 addListenerToElement(document.body, "touchmove", handleTarget, false);
@@ -77,68 +75,188 @@ function mapToMouseEvent(e) {
 }
 
 function start(e) {
-  is_drawing = true;
-  context.beginPath();
-  context.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+  isDrawing = true;
+  ctx.beginPath();
+  ctx.moveTo(e.clientX + canvas.offsetLeft, e.clientY + canvas.offsetTop);
 }
 
 function draw(e) {
-  if (is_drawing) {
-    context.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
-    context.strokeStyle = draw_color;
-    context.lineWidth = draw_width;
-    context.lineCap = "round";
-    context.lineJoin = "round";
-    context.stroke();
+  if (isDrawing) {
+    ctx.lineTo(e.clientX + canvas.offsetLeft, e.clientY + canvas.offsetTop);
+    ctx.strokeStyle = drawColor;
+    ctx.lineWidth = drawWidth;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.stroke();
   }
 }
 
 function stop(e) {
-  if (is_drawing) {
-    context.stroke();
-    context.closePath();
-    is_drawing = false;
+  if (isDrawing) {
+    ctx.stroke();
+    ctx.closePath();
+    isDrawing = false;
   }
 
   if (e.type != "touchend") {
-    canvas_history.push(
-      context.getImageData(0, 0, canvas.width, canvas.height)
-    );
+    canvasHistory.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
     index += 1;
   }
 }
+//#endregion
 
-function clear_canvas() {
-  context.fillStyle = start_background_color;
-  context.clearRect(0, 0, canvas.width, canvas.height);
-  context.fillRect(0, 0, canvas.width, canvas.height);
+//#region --------- Button Logic ---------
+function clearCanvas() {
+  ctx.fillStyle = DEFAULT_BACKGROUND_COLOR;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  canvas_history = [];
-  restore_last_canvas_state = [];
+  canvasHistory = [];
+  restoreLastCanvasState = [];
   index = -1;
 }
 
-function undo_last() {
-  if (canvas_history.length !== 0) {
+function undoLast() {
+  if (canvasHistory.length !== 0) {
     index -= 1;
-    let canvasImage = canvas_history.pop();
-    restore_last_canvas_state.push(canvasImage);
-    if (canvas_history.length > 0) {
-      context.putImageData(canvas_history[index], 0, 0);
+    let canvasImage = canvasHistory.pop();
+    restoreLastCanvasState.push(canvasImage);
+    if (canvasHistory.length > 0) {
+      ctx.putImageData(canvasHistory[index], 0, 0);
     } else {
-      context.fillStyle == start_background_color;
-      context.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle == DEFAULT_BACKGROUND_COLOR;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
   }
   return; // do nothing
 }
 
-function redo_last() {
-  if (restore_last_canvas_state.length !== 0) {
+function redoLast() {
+  if (restoreLastCanvasState.length !== 0) {
     index += 1;
-    let canvasImage = restore_last_canvas_state.pop();
-    canvas_history.push(canvasImage);
-    context.putImageData(canvas_history[index], 0, 0);
+    let canvasImage = restoreLastCanvasState.pop();
+    canvasHistory.push(canvasImage);
+    ctx.putImageData(canvasHistory[index], 0, 0);
   }
-  return; // do noothing
+  return; // do nothing
 }
+
+function drawShapes() {
+  const circles = new Circles();
+  circles.draw();
+
+  const circles2 = new Circles2();
+  circles2.draw();
+
+  const connector = new Connector();
+  connector.draw();
+
+  drawFrac();
+}
+
+function drawFrac() {
+  const lineWidth = Math.random() * 20 + Math.random() * 10;
+  const sides = Math.random() * 12;
+  // ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.save();
+  ctx.lineWidth = lineWidth;
+  ctx.strokeStyle = generateHslColor();
+  ctx.translate(canvas.width / 2, canvas.height / 2);
+  for (let i = 0; i < sides; i++) {
+    ctx.fillStyle = generateHslColor();
+    ctx.rotate(-0.78);
+    drawLines(0);
+  }
+  ctx.restore();
+}
+
+function drawLines(level) {
+  const branches = Math.random() * 2 + 0.7;
+  const size =
+    canvas.width < canvas.height ? canvas.width * 0.3 : canvas.height * 0.3;
+  const spread = Math.random() * 1.5 + 1;
+
+  if (level > maxLevel) return;
+  ctx.beginPath(0, 0);
+  ctx.moveTo(0, 0);
+  ctx.lineTo(500, 0);
+  ctx.stroke();
+  for (let i = 0; i < branches; i++) {
+    ctx.save();
+    ctx.translate(size - (size / branches) * i, 0);
+    ctx.scale(scale, scale);
+    ctx.save();
+    ctx.rotate(spread);
+    drawLines(level + 1);
+    ctx.restore();
+    ctx.restore();
+  }
+  ctx.beginPath();
+  ctx.arc(0, size, size * 0.2, 0, Math.PI * 2);
+  ctx.fill();
+}
+//#endregion
+
+//#region --------- Helpers ---------
+// make a class function to draw circles, rectangles or different shapes
+class Circles {
+  constructor() {
+    this.size = Math.random() * 500 + Math.random() * 800;
+    this.color = color;
+    this.locationX = generateLocationX();
+    this.locationY = generateLocationY();
+  }
+  draw() {
+    ctx.fillStyle = generateHslColor();
+    ctx.beginPath();
+    ctx.arc(this.locationX, this.locationY, this.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+class Circles2 {
+  constructor() {
+    this.size = Math.random() * 1000 + Math.random() * 800;
+    this.color = color;
+    this.locationX = (Math.random() * 390) / generateLocationX();
+    this.locationY = (Math.random() * 1000) / generateLocationY();
+  }
+  draw() {
+    ctx.fillStyle = generateHslColor();
+    ctx.beginPath();
+    ctx.arc(this.locationX, this.locationY, this.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+class Connector {
+  constructor() {
+    this.size = Math.random() * 1000 + Math.random() * 800;
+    this.color = color;
+    this.locationX = (Math.random() * 390) / generateLocationX();
+    this.locationY = (Math.random() * 1000) / generateLocationY();
+  }
+  draw() {
+    ctx.fillStyle = generateHslColor();
+    ctx.beginPath();
+    ctx.arc(this.locationX * 2, this.locationY * 2, this.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+function changeColor(e) {
+  drawColor = e.style["background-color"];
+}
+
+function generateHslColor() {
+  return "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+}
+
+function generateLocationX() {
+  return Math.random() * 1000 + 300;
+}
+
+function generateLocationY() {
+  return Math.random() * 1000 + 450;
+}
+//#endregion

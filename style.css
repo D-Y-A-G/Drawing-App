@@ -6,7 +6,7 @@ body {
 }
 
 #canvas {
-  width: 100%;
+  width: 90%;
   box-shadow: -3px 2px 9px 6px black;
   cursor: pointer;
 }
@@ -24,16 +24,16 @@ body {
   justify-content: center;
   flex-direction: row;
   margin-top: 15px;
-  width: 100%;
+  width: 90%;
 }
 .tools .color-field {
-  height: 40px;
-  width: 40px;
-  min-height: 40px;
-  min-width: 40px;
+  height: 20px;
+  width: 20px;
+  min-height: 20px;
+  min-width: 20px;
   cursor: pointer;
-  box-sizing: border-box;
-  display: inline-block;
+  /* box-sizing: border-box;
+  display: inline-block; */
   border-radius: 50%;
   border: 2px solid white;
   align-self: center;
@@ -42,21 +42,38 @@ body {
 
 .tools .color-field:hover,
 .color-picker:hover {
-  transform: scale(1.2);
+  transform: scale(1.1);
 }
-
+.buttonsAll {
+  font-size: smaller;
+  width: 50%;
+}
 .tools .button {
   font-family: "Sulphur Point", sans-serif;
   align-self: center;
-  width: 80px;
+  width: 60px;
+  font-size: 10px;
   height: 30px;
   border: 2px solid blacks;
   color: white;
   text-shadow: 2px 1px black;
   background-color: royalblue;
-  font-weight: bolder;
-  margin: 0 10px;
+  font-weight: bold;
+  margin: 0 3px;
   border-radius: 7%;
+}
+.tools .color-field,
+.tools .color-picker {
+  margin: 0;
+  font-size: 20px;
+  width: 40px;
+}
+
+.tools .pen-range {
+  width: 60px;
+}
+#buttonRedo {
+  background-color: teal;
 }
 
 .tools .button:hover {
@@ -77,7 +94,14 @@ body {
 
 @media only screen and (max-width: 540px) {
   .tools {
-    flex-direction: column;
-    width: 100%;
+    position: absolute;
+    width: 75%;
+  }
+  .tools .button {
+    width: 35px;
+    height: 22;
+  }
+  .tools .color-field {
+    width: 10px;
   }
 }
