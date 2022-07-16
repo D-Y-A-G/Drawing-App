@@ -20,7 +20,6 @@ let drawColor = generateHslColor();
 let drawWidth = "20";
 let index = -1;
 let isDrawing = false;
-let scale = 0.6;
 let canvasHistory = [];
 let restoreLastCanvasState = [];
 //#endregion
@@ -142,21 +141,20 @@ function redoLast() {
 }
 
 function drawShapes() {
-  const circles = new Circles();
-  circles.draw();
+  // const circles = new Circles();
+  // circles.draw();
 
-  const circles2 = new Circles2();
-  circles2.draw();
+  // const circles2 = new Circles2();
+  // circles2.draw();
 
-  const connector = new Connector();
-  connector.draw();
-
+  // const connector = new Connector();
+  // connector.draw();
   drawFrac();
 }
 
 function drawFrac() {
   const lineWidth = Math.random() * 20 + Math.random() * 10;
-  const sides = Math.random() * 12;
+  const sides = Math.random() * 12; //default  12
   // ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.save();
   ctx.lineWidth = lineWidth;
@@ -164,7 +162,7 @@ function drawFrac() {
   ctx.translate(canvas.width / 2, canvas.height / 2);
   for (let i = 0; i < sides; i++) {
     ctx.fillStyle = generateHslColor();
-    ctx.rotate(-0.78);
+    ctx.rotate(Math.random());
     drawLines(0);
   }
   ctx.restore();
@@ -172,6 +170,7 @@ function drawFrac() {
 
 function drawLines(level) {
   const branches = Math.random() * 2 + 0.7;
+  const scale = Math.random() * 0.9;
   const size =
     canvas.width < canvas.height ? canvas.width * 0.3 : canvas.height * 0.3;
   const spread = Math.random() * 1.5 + 1;
@@ -179,7 +178,7 @@ function drawLines(level) {
   if (level > maxLevel) return;
   ctx.beginPath(0, 0);
   ctx.moveTo(0, 0);
-  ctx.lineTo(500, 0);
+  ctx.lineTo(Math.random() * 500, Math.random() * 500);
   ctx.stroke();
   for (let i = 0; i < branches; i++) {
     ctx.save();
@@ -194,6 +193,13 @@ function drawLines(level) {
   ctx.beginPath();
   ctx.arc(0, size, size * 0.2, 0, Math.PI * 2);
   ctx.fill();
+}
+
+function saveImage() {
+  var image = canvas
+    .toDataURL("image/png")
+    .replace("image/png", "image/octet-stream");
+  window.location.href = image;
 }
 //#endregion
 
