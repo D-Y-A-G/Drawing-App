@@ -1,27 +1,38 @@
+import {
+  generateHslColor,
+  generateLocationX,
+  generateLocationY,
+} from "./utils";
+
 //#region --------- Globals ---------
 const DEFAULT_BACKGROUND_COLOR = "white";
 const aiDraw = document.getElementById("draw");
-const canvas = document.getElementById("canvas");
-canvas.width = window.innerWidth - 10;
-canvas.height = window.innerHeight;
+const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+let ctx;
+if (canvas) {
+  canvas.width = window.innerWidth - 10;
+  canvas.height = window.innerHeight;
+  ctx = canvas.getContext("2d");
+}
 
 const maxLevel = 5;
-let ctx = canvas.getContext("2d");
-ctx.fillStyle = DEFAULT_BACKGROUND_COLOR;
-ctx.lineCap = "round";
-ctx.shadowColor = "rgba(0,0,0, 0.75)";
-ctx.shadowOffsetX = 5;
-ctx.shadowOffsetY = 5;
-ctx.shadowBlur = 10;
-ctx.fillRect(0, 0, canvas.width, canvas.height);
+if (ctx) {
+  ctx.fillStyle = DEFAULT_BACKGROUND_COLOR;
+  ctx.lineCap = "round";
+  ctx.shadowColor = "rgba(0,0,0, 0.75)";
+  ctx.shadowOffsetX = 5;
+  ctx.shadowOffsetY = 5;
+  ctx.shadowBlur = 10;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
 
 let color = generateHslColor();
 let drawColor = generateHslColor();
-let drawWidth = "20";
+let drawWidth = 20;
 let index = -1;
 let isDrawing = false;
-let canvasHistory = [];
-let restoreLastCanvasState = [];
+let canvasHistory: any[] = [];
+let restoreLastCanvasState: any[] = [];
 //#endregion
 
 //#region --------- Drawing Event Listeners ---------
@@ -41,16 +52,17 @@ addListenerToElement(canvas, "mousemove", draw, false);
 addListenerToElement(canvas, "mouseup", stop, false);
 
 function addListenerToElement(element, eventType, listener, options) {
+  if (element == null) return;
   element.addEventListener(eventType, listener, options);
 }
 
-function handleTarget(e) {
+export function handleTarget(e) {
   if (e.target == canvas) {
     e.preventDefault();
   }
 }
 
-function mapToMouseEvent(e) {
+export function mapToMouseEvent(e) {
   const touch = e.touches[0];
   var mouseEvent;
 
@@ -73,14 +85,17 @@ function mapToMouseEvent(e) {
   canvas.dispatchEvent(mouseEvent);
 }
 
-function start(e) {
+export function start(e) {
   isDrawing = true;
-  ctx.beginPath();
-  ctx.moveTo(e.clientX + canvas.offsetLeft, e.clientY + canvas.offsetTop);
+  if (ctx) {
+    ctx.beginPath();
+    ctx.moveTo(e.clientX + canvas.offsetLeft, e.clientY + canvas.offsetTop);
+  }
 }
 
-function draw(e) {
+export function draw(e) {
   if (isDrawing) {
+    if (!ctx) return;
     ctx.lineTo(e.clientX + canvas.offsetLeft, e.clientY + canvas.offsetTop);
     ctx.strokeStyle = drawColor;
     ctx.lineWidth = drawWidth;
@@ -90,14 +105,15 @@ function draw(e) {
   }
 }
 
-function stop(e) {
+export function stop(e) {
   if (isDrawing) {
+    if (!ctx) return;
     ctx.stroke();
     ctx.closePath();
     isDrawing = false;
   }
 
-  if (e.type != "touchend") {
+  if (e.type != "touchend" && ctx) {
     canvasHistory.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
     index += 1;
   }
@@ -105,7 +121,8 @@ function stop(e) {
 //#endregion
 
 //#region --------- Button Logic ---------
-function clearCanvas() {
+export function clearCanvas() {
+  if (!ctx) return;
   ctx.fillStyle = DEFAULT_BACKGROUND_COLOR;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -115,7 +132,8 @@ function clearCanvas() {
   index = -1;
 }
 
-function undoLast() {
+export function undoLast() {
+  if (!ctx) return;
   if (canvasHistory.length !== 0) {
     index -= 1;
     let canvasImage = canvasHistory.pop();
@@ -130,7 +148,8 @@ function undoLast() {
   return; // do nothing
 }
 
-function redoLast() {
+export function redoLast() {
+  if (!ctx) return;
   if (restoreLastCanvasState.length !== 0) {
     index += 1;
     let canvasImage = restoreLastCanvasState.pop();
@@ -140,7 +159,7 @@ function redoLast() {
   return; // do nothing
 }
 
-function drawShapes() {
+export function drawShapes() {
   // const circles = new Circles();
   // circles.draw();
 
@@ -152,10 +171,11 @@ function drawShapes() {
   drawFrac();
 }
 
-function drawFrac() {
+export function drawFrac() {
   const lineWidth = Math.random() * 20 + Math.random() * 10;
   const sides = Math.random() * 12; //default  12
   // ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (!ctx) return;
   ctx.save();
   ctx.lineWidth = lineWidth;
   ctx.strokeStyle = generateHslColor();
@@ -168,15 +188,15 @@ function drawFrac() {
   ctx.restore();
 }
 
-function drawLines(level) {
+export function drawLines(level) {
   const branches = Math.random() * 2 + 0.7;
   const scale = Math.random() * 0.9;
   const size =
     canvas.width < canvas.height ? canvas.width * 0.3 : canvas.height * 0.3;
   const spread = Math.random() * 1.5 + 1;
 
-  if (level > maxLevel) return;
-  ctx.beginPath(0, 0);
+  if (level > maxLevel || !ctx) return;
+  ctx.beginPath();
   ctx.moveTo(0, 0);
   ctx.lineTo(Math.random() * 500, Math.random() * 500);
   ctx.stroke();
@@ -195,7 +215,7 @@ function drawLines(level) {
   ctx.fill();
 }
 
-function saveImage() {
+export function saveImage() {
   var image = canvas
     .toDataURL("image/png")
     .replace("image/png", "image/octet-stream");
@@ -206,6 +226,10 @@ function saveImage() {
 //#region --------- Helpers ---------
 // make a class function to draw circles, rectangles or different shapes
 class Circles {
+  size: number;
+  color: string;
+  locationX: number;
+  locationY: number;
   constructor() {
     this.size = Math.random() * 500 + Math.random() * 800;
     this.color = color;
@@ -213,6 +237,7 @@ class Circles {
     this.locationY = generateLocationY();
   }
   draw() {
+    if (!ctx) return;
     ctx.fillStyle = generateHslColor();
     ctx.beginPath();
     ctx.arc(this.locationX, this.locationY, this.size, 0, Math.PI * 2);
@@ -221,6 +246,10 @@ class Circles {
 }
 
 class Circles2 {
+  size: number;
+  color: string;
+  locationX: number;
+  locationY: number;
   constructor() {
     this.size = Math.random() * 1000 + Math.random() * 800;
     this.color = color;
@@ -228,6 +257,7 @@ class Circles2 {
     this.locationY = (Math.random() * 1000) / generateLocationY();
   }
   draw() {
+    if (!ctx) return;
     ctx.fillStyle = generateHslColor();
     ctx.beginPath();
     ctx.arc(this.locationX, this.locationY, this.size, 0, Math.PI * 2);
@@ -236,6 +266,10 @@ class Circles2 {
 }
 
 class Connector {
+  size: number;
+  color: string;
+  locationX: number;
+  locationY: number;
   constructor() {
     this.size = Math.random() * 1000 + Math.random() * 800;
     this.color = color;
@@ -243,6 +277,7 @@ class Connector {
     this.locationY = (Math.random() * 1000) / generateLocationY();
   }
   draw() {
+    if (!ctx) return;
     ctx.fillStyle = generateHslColor();
     ctx.beginPath();
     ctx.arc(this.locationX * 2, this.locationY * 2, this.size, 0, Math.PI * 2);
@@ -250,19 +285,28 @@ class Connector {
   }
 }
 
-function changeColor(e) {
+export function changeColor(e) {
   drawColor = e.style["background-color"];
 }
 
-function generateHslColor() {
-  return "hsl(" + Math.random() * 360 + ", 100%, 50%)";
-}
+// function generateHslColor() {
+//   return "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+// }
 
-function generateLocationX() {
-  return Math.random() * 1000 + 300;
-}
+// function generateLocationX() {
+//   return Math.random() * 1000 + 300;
+// }
 
-function generateLocationY() {
-  return Math.random() * 1000 + 450;
-}
+// function generateLocationY() {
+//   return Math.random() * 1000 + 450;
+// }
 //#endregion
+
+// export default {
+//   changeColor,
+//   handleTarget,
+//   mapToMouseEvent,
+//   start,
+//   draw,
+//   stop,
+// };
